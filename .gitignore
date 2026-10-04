@@ -1,0 +1,9 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+ml/model.pkl
+ml/metrics.json
+data/prediction_history.sqlite
+.DS_Store
