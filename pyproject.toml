@@ -1,0 +1,7 @@
+[project]
+name = "smartcrop-ai"
+version = "1.0.0"
+requires-python = ">=3.10"
+
+[tool.vercel]
+entrypoint = "backend.app:app"

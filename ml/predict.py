@@ -77,7 +77,8 @@ class CropForecaster:
         outputs = []
         for step in range(1, weeks + 1):
             future_date = start + pd.Timedelta(weeks=step)
-            features = [[len(prices), future_date.month, prices[-1], prices[-2], float(np.mean(prices[-3:]))]]
+            features = pd.DataFrame([[len(prices), future_date.month, prices[-1], prices[-2], float(np.mean(prices[-3:]))]],
+                                    columns=["t", "month", "lag1", "lag2", "rolling3"])
             value = max(.01, float(model.predict(features)[0]))
             outputs.append({"week": step, "date": future_date.strftime("%b %d"), "price": round(value, 2)})
             prices.append(value)
