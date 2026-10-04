@@ -2,6 +2,7 @@
 import json
 import os
 import sqlite3
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -10,13 +11,17 @@ class HistoryStore:
         self.root = Path(root)
         self.mysql = bool(os.getenv("DB_HOST") and os.getenv("DB_NAME"))
         self.backend_name = "MySQL" if self.mysql else "SQLite demo fallback"
+        # Vercel's deployed project directory is read-only; only /tmp is writable.
+        # Its contents are ephemeral, so durable deployed history requires MySQL.
+        self.sqlite_path = (Path(tempfile.gettempdir()) / "smartcrop_prediction_history.sqlite"
+                            if os.getenv("VERCEL") else self.root / "data" / "prediction_history.sqlite")
         if self.mysql:
             self._mysql_init()
         else:
             self._sqlite_init()
 
     def _sqlite(self):
-        conn = sqlite3.connect(self.root / "data" / "prediction_history.sqlite")
+        conn = sqlite3.connect(self.sqlite_path)
         conn.row_factory = sqlite3.Row
         return conn
 

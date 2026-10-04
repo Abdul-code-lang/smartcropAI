@@ -57,6 +57,10 @@ Open **http://127.0.0.1:5000**. The included data is ready immediately; no model
 
 The app currently reads its demonstration historical prices from CSV. The MySQL schema includes normalized crop, market, historical-price, and prediction tables as a future integration path; it does not import the synthetic CSV automatically.
 
+### Vercel deployment
+
+`pyproject.toml` points Vercel to `backend.app:app`. Vercel's function filesystem is read-only except for its temporary directory, so the SQLite demo history is stored in the system temp directory there and can disappear between instances. For durable deployed prediction history, configure the MySQL environment variables in the Vercel project's Settings → Environment Variables, then redeploy. Deployment does not add live market prices.
+
 ## ML workflow and interpretation
 
 The request-time forecast cleans invalid observations, aggregates weekly values for the nearest matching market, creates lag/rolling/time features, evaluates a Random Forest on a chronological holdout, then fits the final model to available series and recursively predicts up to four weeks. Each selected series is fitted once per server process and reused for later requests; restarting Flask clears this small in-memory cache. The selected period chooses week one, two, or four. The UI reports holdout MAE/RMSE/R² instead of inventing a confidence probability. A low or negative R² can happen and signals weak fit; MAE is in the same price units as the data.
